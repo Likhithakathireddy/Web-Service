@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Welcome to Digital Library with Wiki Cards</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+	<link rel="manifest" href="img/site.webmanifest">
+	<!-- <link rel="stylesheet" href="../css/bootstrap.min.css"> -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<!-- <script src="../js/jquery-3.2.1.min.js"></script>
+	<script src="../js/bootstrap.js"></script> -->
+
+	<style type="text/css">
+		body {
+			font-family: 'Verdana';
+			font-size: 16px;
+			font-weight: bold;
+			background-color: #cff4fc;
+
+		}
+
+		.container {
+			margin-bottom: 50px;
+		}
+
+		form {
+			padding: 0 10px;
+
+		}
+
+		.addon-diff-color {
+			background-color: #f0ad4e;
+			color: white;
+		}
+
+		.panel-title {
+			color: #f0ad4e;
+			font-weight: bolder;
+		}
+
+		.sign-up,
+		.forgot-pass {
+			display: none;
+		}
+
+		.alert,
+		#loader {
+			display: none;
+		}
+
+
+		.logo-container {
+			background-color: #ffd867;
+		}
+
+		.logo-container img {
+			max-width: 600px;
+		}
+
+		.login-container {
+			display: grid;
+			grid-template-columns: 50% 50%;
+			height: 100vh;
+			width: 100vw;
+		}
+
+		.vertical-center {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		@media (max-width: 1200px) {
+			.logo-container {
+				display: none;
+			}
+
+			.login-container {
+				display: flex;
+				/* grid-template-columns: 100%; */
+				height: 100vh;
+				width: 100vw;
+				justify-content: center;
+			}
+
+			.vertical-center {
+				width: 40vw;
+			}
+		}
+
+		.row {
+			margin-right: -120px;
+			margin-left: -120px;
+		}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			$.ajax({
+				url: 'action.php',
+				method: 'post',
+				data: 'action=checkCookie'
+			}).done(function(result) {
+				if (result) {
+					console.log(result)
+					var data = JSON.parse(result);
+					$('#email').val(data.email);
+					$('#pwd').val(data.pass);
+				}
+			})
+
+			$('#fname').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z ]+$/;
+				if (regexp.test($('#fname').val())) {
+					$('#fname').closest('.form-group').removeClass('has-error');
+					$('#fname').closest('.form-group').addClass('has-success');
+				} else {
+					$('#fname').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#mobile').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[0-9]{10}$/;
+				if (regexp.test($('#mobile').val())) {
+					$('#mobile').closest('.form-group').removeClass('has-error');
+					$('#mobile').closest('.form-group').addClass('has-success');
+				} else {
+					$('#mobile').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#uemail').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z0-9._]+@[a-zA-Z0-9._]+\.[a-zA-Z]{2,4}$/;
+				if (regexp.test($('#uemail').val())) {
+					$('#uemail').closest('.form-group').removeClass('has-error');
+					$('#uemail').closest('.form-group').addClass('has-success');
+				} else {
+					$('#uemail').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#pass').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z0-9]{6,50}$/;
+				if (regexp.test($('#pass').val())) {
+					$('#pass').closest('.form-group').removeClass('has-error');
+					$('#pass').closest('.form-group').addClass('has-success');
+				} else {
+					$('#pass').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#cfm_pass').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z0-9]{6,50}$/;
+				if (regexp.test($('#cfm_pass').val())) {
+					if ($('#cfm_pass').val() == $('#pass').val()) {
+						$('#cfm_pass').closest('.form-group').removeClass('has-error');
+						$('#cfm_pass').closest('.form-group').addClass('has-success');
+					} else {
+						$('#cfm_pass').closest('.form-group').addClass('has-error');
+					}
+				} else {
+					$('#cfm_pass').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#register').click(function(event) {
+				event.preventDefault();
+				var formData = $('#sign-up-frm').serialize();
+				console.log(formData);
+				$.ajax({
+					url: 'action.php',
+					method: 'post',
+					data: formData + '&action=register'
+				}).done(function(result) {
+					$('.alert').show();
+					$('#result').html(result);
+				})
+			})
+
+			$('#email').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z0-9._]+@[a-zA-Z0-9._]+\.[a-zA-Z]{2,4}$/;
+				if (regexp.test($('#email').val())) {
+					$('#email').closest('.form-group').removeClass('has-error');
+					$('#email').closest('.form-group').addClass('has-success');
+				} else {
+					$('#email').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#pwd').keyup(function() {
+				// var regexp = new RegExp(/^[a-zA-Z]+$/);
+				var regexp = /^[a-zA-Z0-9]{6,50}$/;
+				if (regexp.test($('#pwd').val())) {
+					$('#pwd').closest('.form-group').removeClass('has-error');
+					$('#pwd').closest('.form-group').addClass('has-success');
+				} else {
+					$('#pwd').closest('.form-group').addClass('has-error');
+				}
+			})
+
+			$('#login').click(function(event) {
+
+				var response = grecaptcha.getResponse();
+				//alert(response);
+				if (response.length == 0) {
+
+					alert("Please verify that you are not a robot");
+					return false;
+				}
+				
+						document.location = 'auth.html';
+					
+			})
+
+			$('#reset').click(function(event) {
+				event.preventDefault();
+				var formData = $('#forgot-pass-frm').serialize();
+				console.log(formData);
+				$('#loader').show();
+				$.ajax({
+					url: 'action.php',
+					method: 'post',
+					data: formData + '&action=resetPass'
+				}).done(function(result) {
+					$('#loader').hide();
+					console.log(result);
+					var data = JSON.parse(result);
+					$('.alert').show();
+					if (data.status == 0) {
+						$('#result').html(data.msg);
+					} else {
+						$('#result').html(data.msg);
+					}
+
+				})
+			})
+
+		})
+	</script>
+</head>
+
+<body>
+	<div class="login-container">
+		<div class="logo-container vertical-center">
+			<img src="img/animated5.gif" alt="" />
+			<!-- <img src="img/logo.png" alt="" /> -->
+		</div>
+		<div class=" vertical-center text-center">
+			<div class="container">
+				<h2 class="text-center " style="	font-size: 40px;
+			font-weight: bold;">Digital Library with Wiki Cards</h2>
+				<h4 class="text-center">CS518-Web programming Project</h4>
+				<hr>
+				<div class="row row">
+					<div class="col-md-6 col-md-offset-3">
+						<div class="alert alert-danger alert-dismissible" role="alert">
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">x</button>
+							<div id="result"></div>
+						</div>
+					</div>
+					<div class="col-md-6 col-md-offset-3 sign-up">
+						<div class="panel">
+							<div class="panel-heading">
+								<h3 class="panel-title text-center">SIGN UP FORM</h3>
+							</div>
+							<div class="panel-body">
+								<form id="sign-up-frm" role="form" method="post" action="" class="form-horizontal">
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-user"></span>
+											</div>
+											<input type="text" class="form-control" id="fname" name="fname" placeholder="Full Name">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-earphone"></span>
+											</div>
+											<input type="text" class="form-control" id="mobile" name="mobile" placeholder="Mobile Number">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-envelope"></span>
+											</div>
+											<input type="email" class="form-control" id="uemail" name="uemail" placeholder="Email Address">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-lock"></span>
+											</div>
+											<input type="password" class="form-control" id="pass" name="pass" placeholder="Password">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-lock"></span>
+											</div>
+											<input type="password" class="form-control" id="cfm_pass" name="cfm_pass" placeholder="Confirm Password">
+										</div>
+									</div>
+									<div class="form-group">
+										<input type="submit" value="REGISTER" class="btn btn-warning btn-block" id="register" name="register">
+									</div>
+									<div class="form-group">
+										<div class="col-md-12 control">
+											<div style="border-top: 1px solid#888; padding-top:15px; font-size:85%">
+												Already have an account!
+												<a href="#" onClick="$('.sign-up').hide(); $('.sign-in').show()">
+													Sign in Here
+												</a>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-md-offset-3 sign-in">
+						<div class="panel">
+							<div class="panel-heading">
+								<h3 class="panel-title text-center">SIGN IN FORM</h3><br>
+								<div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="#" onClick="$('.sign-in').hide(); $('.forgot-pass').show()">Forgot Password?</a></div>
+							</div>
+							<div class="panel-body">
+								<form id="sign-in-frm" role="form" method="post" action="" class="form-horizontal">
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-envelope"></span>
+											</div>
+											<input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-lock"></span>
+											</div>
+											<input type="password" class="form-control" id="pwd" name="pwd" placeholder="Password">
+										</div>
+									</div>
+
+
+
+									<div class="form-group">
+										<input type="checkbox" class="form-control" id="remember-me" name="remember-me" style="width: 30px;">
+										<div style="position: relative; top: -30px; left: 40px; text-align: initial;"> Remember Me </div>
+									</div>
+
+									<div class="form-group">
+										<div class="g-recaptcha" data-sitekey="6LdI8CcjAAAAAEJ9gKSbZ9vq7nKLngHLws3YfPLk"></div>
+									</div>
+
+									<div class="form-group">
+										<!--<a href="#" onClick="window.location.href = 'auth.php';"> <input type=" submit"  value="Login" class="btn btn-warning btn-block" id="login" name="login"></a> -->
+										<input type=" submit" value="Login" class="btn btn-warning btn-block" id="login" name="login">
+
+									</div>
+									<div class="form-group">
+										<div class="col-md-12 control">
+											<div style="border-top: 1px solid#888; padding-top:15px; font-size:85%">
+												Don't have an account!
+												<a href="#" onClick="$('.sign-in').hide(); $('.sign-up').show()">
+													Sign Up Here
+												</a>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-md-offset-3 forgot-pass">
+						<div class="panel">
+							<div class="panel-heading">
+								<h3 class="panel-title text-center">RECOVER YOUR PASSWORD</h3><br>
+								<div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="#" onClick="$('.forgot-pass').hide(); $('.sign-in').show()">Sign In</a></div>
+							</div>
+							<div class="panel-body">
+								<form id="forgot-pass-frm" role="form" method="post" action="" class="form-horizontal">
+									<div class="form-group">
+										<div class="input-group">
+											<div class="input-group-addon addon-diff-color">
+												<span class="glyphicon glyphicon-envelope"></span>
+											</div>
+											<input type="email" class="form-control" id="remail" name="remail" placeholder="Email Address">
+										</div>
+									</div>
+									<div class="form-group">
+										<input type="submit" value="GENERATE NEW PASSWORD" class="btn btn-warning btn-block" id="reset" name="reset">
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+
+</html>
